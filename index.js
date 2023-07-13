@@ -30,6 +30,11 @@ if (app.settings.env === 'production') app.disable('verbose errors')
 // ????
 silent || app.use(logger('dev'));
 
+app.get('/admin/*', function(req, res, next){
+  req.admin = true;
+  next();
+});
+
 // Routes
 // тут когда делаешь гет запрос то рендрит файл index.ejs?
 
@@ -37,6 +42,47 @@ app.get('/', function(req, res){
   res.render('index.ejs');
 });
 // тут когда делаешь гет запрос c маршрутом http://localhost:3000/404 то что????
+
+app.get('/news', function(req, res){
+  
+  res.render('news-main.ejs');
+});
+
+app.get('/news/admin', function(req, res){
+  res.render('news-item.ejs');
+});
+
+app.get('/news/*', function(req, res, next){
+  if (false) {
+    res.render('news-item.ejs');
+  } else {
+    const error = new Error();
+    error.message = "News not available";
+    next(error);
+  }
+});
+
+app.get('/image/*', function(req, res, next){
+  if (false) {
+    res.render('news-item.ejs');
+  } else {
+    const error = new Error();
+    error.message = "Image not available";
+    next(error);
+  }
+});
+
+app.get('/admin/image/*', function(req, res, next){
+  if (false) {
+    res.render('news-item.ejs');
+  } else {
+    const error = new Error();
+    error.message = "Image not available";
+    next(error);
+  }
+});
+
+
 
 app.get('/404', function(req, res, next){
   // trigger a 404 since no other middleware
@@ -102,7 +148,7 @@ app.use(function(err, req, res, next){
   // here and next(err) appropriately, or if
   // we possibly recovered from the error, simply next().
   res.status(err.status || 500);
-  res.render('500', { error: err });
+  res.render('500', { error: err, message: !!req.admin && err.message });
 });
 
 /* istanbul ignore next */
